@@ -1,4 +1,5 @@
 #include "../include/main_frame.h"
+#include "../../toolbar/include/toolbar.h"
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtGui/QGuiApplication>
@@ -17,12 +18,9 @@ auto desktop_centre(const int32_t w, int32_t h) {
 }
 } // end anonymous namespace
 
-main_frame::main_frame() 
-    : _main_window(new QWidget), _main_layout(new QVBoxLayout(_main_window))
+main_frame::main_frame() : QWidget(),
+    _main_layout(new QVBoxLayout(this)), _toolbar(new toolbar(this))
 {
-    _main_window->setGeometry(desktop_centre(640, 480));
-}
-
-void main_frame::show() {
-    _main_window->show();
+    setGeometry(desktop_centre(640, 480));
+    _main_layout->addWidget(_toolbar);
 }
