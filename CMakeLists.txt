@@ -39,3 +39,12 @@ target_link_libraries(pathfinder
         Qt::Widgets
         Qt::Gui
 )
+
+set_property(TARGET pathfinder
+    PROPERTY CXX_STANDARD 20
+)
+
+file(COPY
+    ui/components/toolbar/run_algorithm_button/source/run_algorithm_button.svg
+    DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
+)
