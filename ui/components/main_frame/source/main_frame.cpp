@@ -23,4 +23,5 @@ main_frame::main_frame() : QWidget(),
 {
     setGeometry(desktop_centre(640, 480));
     _main_layout->addWidget(_toolbar);
+    setWindowTitle("Pathfinding Visualiser");
 }
