@@ -6,4 +6,5 @@ algorithm_selection::algorithm_selection(QWidget *parent) : QComboBox(parent)
         "Dijkstra",
         "A*"
     });
+    setToolTip("Select an algorithm to run.");
 }
