@@ -7,11 +7,13 @@
 toolbar::toolbar(QWidget *parent) : QWidget(parent),
     _layout(new QHBoxLayout(this)), _algorithm_selection(new algorithm_selection(this)),
     _run_algorithm_btn(new icon_button(this, "run_algorithm_button.svg", "Run the selected algorithm.")),
-    _start_position_btn(new icon_button(parent, "start_position_button.svg", "Select the starting position node"))
+    _start_position_btn(new icon_button(this, "start_position_button.svg", "Select the starting position node")),
+    _end_position_btn(new icon_button(this, "end_position_button.svg", "Select the ending position node"))
 {
     setLayout(_layout);
     _layout->addWidget(_algorithm_selection);
     _layout->addWidget(_run_algorithm_btn);
     _layout->addStretch();
     _layout->addWidget(_start_position_btn);
+    _layout->addWidget(_end_position_btn);
 }
