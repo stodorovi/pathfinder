@@ -18,4 +18,5 @@ toolbar::toolbar(QWidget *parent) : QWidget(parent),
     _layout->addWidget(_start_position_btn);
     _layout->addWidget(_end_position_btn);
     _layout->addWidget(_untraversable_node_button);
+    _layout->setSpacing(5);
 }
