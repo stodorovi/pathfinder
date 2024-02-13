@@ -52,3 +52,7 @@ file(COPY
     ui/components/toolbar/icons/start_position_button.svg
     DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
 )
+file(COPY
+    ui/components/toolbar/icons/end_position_button.svg
+    DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
+)
