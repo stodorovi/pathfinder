@@ -17,10 +17,10 @@ find_package(Qt6
 set(toolbar_sources
     ui/components/toolbar/include/toolbar.h
     ui/components/toolbar/source/toolbar.cpp
+    ui/components/toolbar/icon_button/include/icon_button.h
+    ui/components/toolbar/icon_button/source/icon_button.cpp
     ui/components/toolbar/algorithm_selection/include/algorithm_selection.h
     ui/components/toolbar/algorithm_selection/source/algorithm_selection.cpp
-    ui/components/toolbar/run_algorithm_button/include/run_algorithm_button.h
-    ui/components/toolbar/run_algorithm_button/source/run_algorithm_button.cpp
 )
 
 set(sources
@@ -45,6 +45,10 @@ set_property(TARGET pathfinder
 )
 
 file(COPY
-    ui/components/toolbar/run_algorithm_button/source/run_algorithm_button.svg
+    ui/components/toolbar/icons/run_algorithm_button.svg
+    DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
+)
+file(COPY
+    ui/components/toolbar/icons/start_position_button.svg
     DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
 )

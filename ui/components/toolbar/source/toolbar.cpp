@@ -1,15 +1,17 @@
 #include "../include/toolbar.h"
 #include "../algorithm_selection/include/algorithm_selection.h"
-#include "../run_algorithm_button/include/run_algorithm_button.h"
+#include "../icon_button/include/icon_button.h"
 
 #include <QtWidgets/QHBoxLayout>
 
 toolbar::toolbar(QWidget *parent) : QWidget(parent),
     _layout(new QHBoxLayout(this)), _algorithm_selection(new algorithm_selection(this)),
-    _run_algorithm_btn(new run_algorithm_button(this))
+    _run_algorithm_btn(new icon_button(this, "run_algorithm_button.svg", "Run the selected algorithm.")),
+    _start_position_btn(new icon_button(parent, "start_position_button.svg", "Select the starting position node"))
 {
     setLayout(_layout);
     _layout->addWidget(_algorithm_selection);
     _layout->addWidget(_run_algorithm_btn);
     _layout->addStretch();
+    _layout->addWidget(_start_position_btn);
 }
