@@ -56,3 +56,7 @@ file(COPY
     ui/components/toolbar/icons/end_position_button.svg
     DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
 )
+file(COPY
+    ui/components/toolbar/icons/untraversable_node_button.svg
+    DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
+)
