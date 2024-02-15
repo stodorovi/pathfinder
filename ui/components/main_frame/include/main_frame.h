@@ -1,15 +1,13 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtWidgets/QMainWindow>
 
-class QVBoxLayout;
 class toolbar;
 
-class main_frame : public QWidget {
+class main_frame : public QMainWindow {
     Q_OBJECT
     
 private:
-    QVBoxLayout* _main_layout;
     toolbar* _toolbar;
 
 public:

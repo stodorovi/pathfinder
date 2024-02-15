@@ -1,16 +1,15 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtWidgets/QToolBar>
 
 class QHBoxLayout;
 class algorithm_selection;
 class icon_button;
 
-class toolbar : public QWidget {
+class toolbar : public QToolBar {
     Q_OBJECT
-private:
-    QHBoxLayout* _layout;
 
+private:
     algorithm_selection* _algorithm_selection;
     icon_button* _run_algorithm_btn;
     icon_button* _start_position_btn;

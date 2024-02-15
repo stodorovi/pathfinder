@@ -18,10 +18,10 @@ auto desktop_centre(const int32_t w, int32_t h) {
 }
 } // end anonymous namespace
 
-main_frame::main_frame() : QWidget(),
-    _main_layout(new QVBoxLayout(this)), _toolbar(new toolbar(this))
+main_frame::main_frame() : QMainWindow(),
+    _toolbar(new toolbar())
 {
+    this->addToolBar(_toolbar);
     setGeometry(desktop_centre(640, 480));
-    _main_layout->addWidget(_toolbar);
     setWindowTitle("Pathfinding Visualiser");
 }
