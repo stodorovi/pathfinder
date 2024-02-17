@@ -2,7 +2,6 @@
 #include <format>
 
 namespace path {
-
 inline std::filesystem::path& app_dir() {
     static std::filesystem::path _;
     return _;

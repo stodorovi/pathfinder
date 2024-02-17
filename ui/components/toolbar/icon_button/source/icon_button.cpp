@@ -1,5 +1,5 @@
 #include "../include/icon_button.h"
-#include "../../../../include/path_utils.h"
+#include "include/path_utils.h"
 
 icon_button::icon_button(QWidget *parent, const char *icon_name, const char *tooltip) {
     setToolTip(tooltip);

@@ -1,5 +1,6 @@
 #include "../include/main_frame.h"
 #include "../../toolbar/include/toolbar.h"
+#include "../../grid/include/grid.h"
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtGui/QGuiApplication>
@@ -24,4 +25,5 @@ main_frame::main_frame() : QMainWindow(),
     this->addToolBar(_toolbar);
     setGeometry(desktop_centre(640, 480));
     setWindowTitle("Pathfinding Visualiser");
+    setCentralWidget(new grid(this));
 }

@@ -23,15 +23,29 @@ set(toolbar_sources
     ui/components/toolbar/algorithm_selection/source/algorithm_selection.cpp
 )
 
-set(sources
-    ui/source/pathfinder_app.cpp
+set(grid_sources
+    ui/components/grid/include/grid.h
+    ui/components/grid/source/grid.cpp
+)
+
+set(ui_sources
     ui/components/main_frame/include/main_frame.h
     ui/components/main_frame/source/main_frame.cpp
     ${toolbar_sources}
+    ${grid_sources}
+)
+    
+set(sources
+    source/pathfinder_app.cpp
+    ${ui_sources}
 )
 
 add_executable(pathfinder
     ${sources}
+)
+
+target_include_directories(pathfinder
+    PUBLIC ${PROJECT_SOURCE_DIR}
 )
 
 target_link_libraries(pathfinder
@@ -44,19 +58,16 @@ set_property(TARGET pathfinder
     PROPERTY CXX_STANDARD 20
 )
 
-file(COPY
+set(icons_sources
     ui/components/toolbar/icons/run_algorithm_button.svg
-    DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
-)
-file(COPY
     ui/components/toolbar/icons/start_position_button.svg
-    DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
-)
-file(COPY
     ui/components/toolbar/icons/end_position_button.svg
-    DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
-)
-file(COPY
     ui/components/toolbar/icons/untraversable_node_button.svg
-    DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
 )
+
+foreach(icon_src ${icons_sources})
+    file(COPY
+        ${icon_src}
+        DESTINATION ${CMAKE_BINARY_DIR}/resources/icons/
+    )
+endforeach()
