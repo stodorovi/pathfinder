@@ -7,4 +7,5 @@ class grid : public QTableWidget {
 
 public:
     grid(QWidget* parent, size_t width, size_t height);
+    void wheelEvent(QWheelEvent *event) override;
 };
