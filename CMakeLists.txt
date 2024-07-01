@@ -17,10 +17,12 @@ find_package(Qt6
 set(toolbar_sources
     ui/components/toolbar/include/toolbar.h
     ui/components/toolbar/source/toolbar.cpp
-    ui/components/toolbar/icon_button/include/icon_button.h
-    ui/components/toolbar/icon_button/source/icon_button.cpp
-    ui/components/toolbar/algorithm_selection/include/algorithm_selection.h
-    ui/components/toolbar/algorithm_selection/source/algorithm_selection.cpp
+    ui/components/toolbar/include/icon_button.h
+    ui/components/toolbar/source/icon_button.cpp
+    ui/components/toolbar/include/algorithm_selection.h
+    ui/components/toolbar/source/algorithm_selection.cpp
+    ui/components/toolbar/include/grid_creation_dialog.h
+    ui/components/toolbar/source/grid_creation_dialog.cpp
 )
 
 set(grid_sources
@@ -63,6 +65,7 @@ set(icons_sources
     ui/components/toolbar/icons/start_position_button.svg
     ui/components/toolbar/icons/end_position_button.svg
     ui/components/toolbar/icons/untraversable_node_button.svg
+    ui/components/toolbar/icons/create_new_grid_button.svg
 )
 
 foreach(icon_src ${icons_sources})

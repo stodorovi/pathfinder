@@ -6,5 +6,5 @@ class grid : public QTableWidget {
     Q_OBJECT
 
 public:
-    grid(QWidget* parent = nullptr);
+    grid(QWidget* parent, size_t width, size_t height);
 };

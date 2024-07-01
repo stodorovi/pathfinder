@@ -1,6 +1,9 @@
 #include "../include/main_frame.h"
 #include "../../toolbar/include/toolbar.h"
+#include "../../toolbar/include/icon_button.h"
+#include "../../toolbar/include/grid_creation_dialog.h"
 #include "../../grid/include/grid.h"
+
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtGui/QGuiApplication>
@@ -17,6 +20,7 @@ auto desktop_centre(const int32_t w, int32_t h) {
     rv.setRect(x, y, w, h);
     return rv;
 }
+
 } // end anonymous namespace
 
 main_frame::main_frame() : QMainWindow(),
@@ -25,5 +29,15 @@ main_frame::main_frame() : QMainWindow(),
     this->addToolBar(_toolbar);
     setGeometry(desktop_centre(640, 480));
     setWindowTitle("Pathfinding Visualiser");
-    setCentralWidget(new grid(this));
+
+    connect(_toolbar->new_grid_btn(), &QPushButton::released, this, &main_frame::_create_new_grid);
+}
+
+void main_frame::_create_new_grid() {
+    grid_creation_dialog d;
+    d.exec();
+    auto [x, y] = d.values();
+
+    const bool valid_grid = x && y;
+    setCentralWidget(valid_grid ? new grid(this, x, y) : nullptr);
 }
