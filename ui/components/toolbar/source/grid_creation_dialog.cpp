@@ -17,6 +17,7 @@ grid_creation_dialog::grid_creation_dialog()
     
     _layout->addRow(_height_label, _height_input);
     _layout->addRow(_width_label, _width_input);
+    _width_input->setMaximum(180);
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
     _layout->addRow(buttons);
