@@ -1,4 +1,5 @@
 #include "../include/grid.h"
+#include "../include/cell.h"
 
 #include <QtWidgets/QHeaderView>
 #include <QWheelEvent>
@@ -55,9 +56,9 @@ void create_table(grid& g, uint8_t width, uint8_t height) {
 
     for (size_t row = 0; row < height; ++row)
         for (size_t column = 0; column < width; ++column) {
-            auto* cell = new QTableWidgetItem();
-            g.setItem(row, column, cell);
-            cell->setBackground(Qt::gray);
+            auto* c = new cell();
+            c->state(cell_state::empty);
+            g.setItem(row, column, c);
         }
 }
 } // end anonymous namespace

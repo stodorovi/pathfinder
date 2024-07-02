@@ -43,3 +43,15 @@ icon_button *toolbar::run_algorithm_btn() const {
 algorithm toolbar::current_algorithm() const {
     return static_cast<algorithm>(_algorithm_selection->currentIndex());
 }
+
+icon_button* toolbar::start_position_btn() const {
+    return _start_position_btn;
+}
+
+icon_button* toolbar::end_position_btn() const {
+    return _end_position_btn;
+}
+
+icon_button* toolbar::untraversable_node_button() const {
+    return _untraversable_node_button;
+}

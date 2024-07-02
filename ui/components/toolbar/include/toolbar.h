@@ -24,5 +24,8 @@ public:
 
     icon_button* new_grid_btn() const;
     icon_button* run_algorithm_btn() const; 
-    algorithm current_algorithm() const;  
+    algorithm current_algorithm() const; 
+    icon_button* start_position_btn() const;
+    icon_button* end_position_btn() const;
+    icon_button* untraversable_node_button() const;
 };
