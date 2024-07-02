@@ -11,6 +11,7 @@ private:
     toolbar* _toolbar;
 
     void _create_new_grid();
+    void _run_algorithm();
 
 public:
     main_frame();

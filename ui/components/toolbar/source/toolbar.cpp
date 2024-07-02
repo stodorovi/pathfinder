@@ -5,11 +5,13 @@
 #include <QtWidgets/QHBoxLayout>
 
 namespace {
+
 QWidget* create_stretcher(QWidget* parent) {
     auto* seperator = new QWidget(parent);
     seperator->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     return seperator;
 }
+
 } // end anonymous namespace
 
 toolbar::toolbar(QWidget *parent) : QToolBar(parent),
@@ -32,4 +34,12 @@ toolbar::toolbar(QWidget *parent) : QToolBar(parent),
 
 icon_button* toolbar::new_grid_btn() const {
     return _new_grid_btn;
+}
+
+icon_button *toolbar::run_algorithm_btn() const {
+    return _run_algorithm_btn;
+}
+
+algorithm toolbar::current_algorithm() const {
+    return static_cast<algorithm>(_algorithm_selection->currentIndex());
 }

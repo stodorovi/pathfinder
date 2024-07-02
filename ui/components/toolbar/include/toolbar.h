@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../include/algorithms.h"
 #include <QtWidgets/QToolBar>
 
 class QHBoxLayout;
@@ -22,4 +23,6 @@ public:
     explicit toolbar(QWidget* parent = nullptr);
 
     icon_button* new_grid_btn() const;
+    icon_button* run_algorithm_btn() const; 
+    algorithm current_algorithm() const;  
 };

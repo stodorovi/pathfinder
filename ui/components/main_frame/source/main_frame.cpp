@@ -31,6 +31,7 @@ main_frame::main_frame() : QMainWindow(),
     setWindowTitle("Pathfinding Visualiser");
 
     connect(_toolbar->new_grid_btn(), &QPushButton::released, this, &main_frame::_create_new_grid);
+    connect(_toolbar->run_algorithm_btn(), &QPushButton::released, this, &main_frame::_run_algorithm);
 }
 
 void main_frame::_create_new_grid() {
@@ -40,4 +41,7 @@ void main_frame::_create_new_grid() {
 
     const bool valid_grid = x && y;
     setCentralWidget(valid_grid ? new grid(this, x, y) : nullptr);
+}
+
+void main_frame::_run_algorithm() {
 }
