@@ -46,7 +46,20 @@ void main_frame::_create_new_grid() {
 }
 
 void main_frame::_on_cell_click(QTableWidgetItem* i) {
+    static cell* start_cell = nullptr;
+    static cell* end_cell = nullptr;
+
     cell* c = (cell*)i;
+    if (_cell_set_state == cell_state::start) {
+        if (start_cell && start_cell != c) start_cell->state(cell_state::empty);
+        start_cell = c;
+    }
+
+    if (_cell_set_state == cell_state::end) {
+        if (end_cell && end_cell != c) end_cell->state(cell_state::empty);
+        end_cell = c;
+    }
+
     c->state(_cell_set_state);
 }
 
