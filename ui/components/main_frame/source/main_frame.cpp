@@ -4,12 +4,24 @@
 #include "../../toolbar/include/grid_creation_dialog.h"
 #include "../../grid/include/grid.h"
 
+#include "../../../../routing/components/include/graph.h"
+#include "../../../../routing/components/include/edge_helper.h"
+#include "../../../../routing/routers/include/dijkstra.h"
+
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 
+#include <queue>
+
+using grid_point = graph::types::point<int32_t>;
+using grid_node = graph::components::node<int32_t>;
+using grid_node_ptr = graph::node_ptr<int32_t>;
+using grid_graph = graph::graph<int32_t>;
+
 namespace {
+
 auto desktop_centre(const int32_t w, int32_t h) {
     const auto screen = QGuiApplication::primaryScreen()->geometry();
 
@@ -19,6 +31,72 @@ auto desktop_centre(const int32_t w, int32_t h) {
     QRect rv;
     rv.setRect(x, y, w, h);
     return rv;
+}
+
+const std::vector<const cell*> get_surrounding_cells(
+    grid const * const g, const int32_t row, const int32_t column
+) {
+    std::vector<const cell*> rv;
+    if (const auto* c = (cell*)g->item(row - 1, column);     c && c->state() != cell_state::untraversable)
+        rv.push_back(c);
+    if (const auto* c = (cell*)g->item(row - 1, column + 1); c && c->state() != cell_state::untraversable)
+        rv.push_back(c);
+    if (const auto* c = (cell*)g->item(row,     column + 1); c && c->state() != cell_state::untraversable)
+        rv.push_back(c);
+    if (const auto* c = (cell*)g->item(row + 1, column + 1); c && c->state() != cell_state::untraversable)
+        rv.push_back(c);
+    if (const auto* c = (cell*)g->item(row + 1, column);     c && c->state() != cell_state::untraversable)
+        rv.push_back(c);
+    if (const auto* c = (cell*)g->item(row + 1, column - 1); c && c->state() != cell_state::untraversable)
+        rv.push_back(c);
+    if (const auto* c = (cell*)g->item(row,     column - 1); c && c->state() != cell_state::untraversable)
+        rv.push_back(c);
+    if (const auto* c = (cell*)g->item(row - 1, column - 1); c && c->state() != cell_state::untraversable)
+        rv.push_back(c);
+    return rv;
+}
+
+std::vector<std::vector<grid_node_ptr>> create_nodes(grid const * const g) {
+    const int32_t rows = g->rowCount();
+    std::vector<std::vector<grid_node_ptr>> rv(rows);
+
+    const int32_t columns = g->columnCount();
+    for (int32_t r = 0; r < rows; ++r) {
+        rv[r] = std::vector<grid_node_ptr>(columns);
+
+        for (int32_t c = 0; c < columns; ++c) {
+            if (const auto* cl = (cell*)g->item(r, c); cl && cl->state() != cell_state::untraversable)
+                rv[r][c] = std::make_unique<grid_node>(grid_point{ c, r });
+        }
+    }
+
+    return rv;
+}
+
+grid_graph connect_graph(grid const * const g, std::vector<std::vector<grid_node_ptr>> nodes) {
+    grid_graph rv(nullptr);
+
+    grid_node_ptr origin_node = nullptr;
+
+    for (auto& row : nodes) {
+        for (auto& node : row) {
+            if (!node) continue;
+            if (!origin_node) origin_node = node;
+
+            auto p = node->pos();
+            for (auto sn : get_surrounding_cells(g, p.y, p.x)) {
+                grid_point pt { sn->column(), sn->row() };
+                node->insert_edge(edge_helper::create_edge(1, nodes[sn->row()][sn->column()]));
+            }
+        }
+    }
+
+    rv.reset(origin_node);
+    return rv;
+}
+
+grid_graph create_graph(grid const * const g) {
+    return connect_graph(g, create_nodes(g));
 }
 
 } // end anonymous namespace
@@ -64,6 +142,8 @@ void main_frame::_on_cell_click(QTableWidgetItem* i) {
 }
 
 void main_frame::_run_algorithm() {
+    grid_graph graph = create_graph(_grid);
+    graph::router::dijkstra dr(graph);
 }
 
 void main_frame::_register_connections() {
