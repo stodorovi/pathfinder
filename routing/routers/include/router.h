@@ -12,10 +12,32 @@ namespace router {
 ARITMETIC_T class router {
 public:
 struct route {
+
+    struct route_iterator_sentinel{};
+    class route_iterator {
+    private:
+        components::node_ptr<T> _node;
+
+    public:
+        route_iterator(components::node_ptr<T> n) : _node(std::move(n)) {}
+        bool operator==(route_iterator_sentinel) const { return _node == nullptr; }
+        route_iterator& operator++() {
+            _node = (_node && !_node->edges().empty())
+                ? _node->edges().front().node
+                : nullptr
+            ;
+            return *this;
+        }
+        types::point<T> operator*() { return _node->pos(); }
+    };
+
     components::node_ptr<T> node;
     components::weight_t length;
     using route_visitation_order = std::vector<components::node_ptr<T>>;
     route_visitation_order visitation_order;
+
+    route_iterator begin() const { return { node }; }
+    route_iterator_sentinel end() const { return {}; }
 };
 
 protected:
@@ -88,11 +110,12 @@ protected:
     }
 
 public:
-    router(graph<T>& graph) : _graph(graph) {};
+    router(const graph<T>& graph) : _graph(graph) {};
+    virtual ~router() {};
 
-    virtual route calc(types::point<T> start, types::point<T> end) = 0;
+    virtual route calc(types::point<T> start, types::point<T> end) const = 0;
     
-    virtual route calc(components::node_ptr<T> start, components::node_ptr<T> end) final {
+    route calc(components::node_ptr<T> start, components::node_ptr<T> end) const {
         return this->calc(start->pos(), end->pos());
     }
 

@@ -13,12 +13,14 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 
+#include <format>
 #include <queue>
 
-using grid_point = graph::types::point<int32_t>;
-using grid_node = graph::components::node<int32_t>;
-using grid_node_ptr = graph::node_ptr<int32_t>;
-using grid_graph = graph::graph<int32_t>;
+using grid_type = int32_t;
+using grid_point = graph::types::point<grid_type>;
+using grid_node = graph::components::node<grid_type>;
+using grid_node_ptr = graph::node_ptr<grid_type>;
+using grid_graph = graph::graph<grid_type>;
 
 namespace {
 
@@ -56,21 +58,29 @@ const std::vector<const cell*> get_surrounding_cells(
     return rv;
 }
 
-std::vector<std::vector<grid_node_ptr>> create_nodes(grid const * const g) {
+std::tuple<std::vector<std::vector<grid_node_ptr>>, grid_point, grid_point>
+create_nodes(grid const * const g) {
     const int32_t rows = g->rowCount();
-    std::vector<std::vector<grid_node_ptr>> rv(rows);
+    std::vector<std::vector<grid_node_ptr>> nodes(rows);
+    grid_point start;
+    grid_point end;
 
     const int32_t columns = g->columnCount();
     for (int32_t r = 0; r < rows; ++r) {
-        rv[r] = std::vector<grid_node_ptr>(columns);
+        nodes[r] = std::vector<grid_node_ptr>(columns);
 
         for (int32_t c = 0; c < columns; ++c) {
-            if (const auto* cl = (cell*)g->item(r, c); cl && cl->state() != cell_state::untraversable)
-                rv[r][c] = std::make_unique<grid_node>(grid_point{ c, r });
+            if (const auto* cl = (cell*)g->item(r, c); cl && cl->state() != cell_state::untraversable) {
+                auto n = std::make_unique<grid_node>(grid_point{ c, r });
+                const grid_point npos = n->pos();
+                if (cl->state() == cell_state::start) start = npos;
+                else if (cl->state() == cell_state::end) end = npos;
+                nodes[r][c] = std::move(n);
+            }
         }
     }
 
-    return rv;
+    return std::make_tuple(nodes, start, end);
 }
 
 grid_graph connect_graph(grid const * const g, std::vector<std::vector<grid_node_ptr>> nodes) {
@@ -84,9 +94,10 @@ grid_graph connect_graph(grid const * const g, std::vector<std::vector<grid_node
             if (!origin_node) origin_node = node;
 
             auto p = node->pos();
-            for (auto sn : get_surrounding_cells(g, p.y, p.x)) {
-                grid_point pt { sn->column(), sn->row() };
-                node->insert_edge(edge_helper::create_edge(1, nodes[sn->row()][sn->column()]));
+            const auto sns = get_surrounding_cells(g, p.y, p.x);
+            for (auto n : sns) {
+                grid_point pt { n->column(), n->row() };
+                node->insert_edge(edge_helper::create_edge(1, nodes[n->row()][n->column()]));
             }
         }
     }
@@ -95,8 +106,18 @@ grid_graph connect_graph(grid const * const g, std::vector<std::vector<grid_node
     return rv;
 }
 
-grid_graph create_graph(grid const * const g) {
-    return connect_graph(g, create_nodes(g));
+std::tuple<grid_graph, grid_point, grid_point> create_graph(grid const * const g) {
+    auto [nodes, start, end] = create_nodes(g);
+    return std::make_tuple(connect_graph(g, nodes), start, end);
+}
+
+void log_route(auto& route) {
+    static std::string log;
+    log = "Route: ";
+    for (auto n : route) {
+        log.append(std::format("({},{}) -> ", n.x, n.y));
+    }
+    printf("%s", log.append(std::format("LEN: {}\n", route.length)).c_str());
 }
 
 } // end anonymous namespace
@@ -142,8 +163,26 @@ void main_frame::_on_cell_click(QTableWidgetItem* i) {
 }
 
 void main_frame::_run_algorithm() {
-    grid_graph graph = create_graph(_grid);
-    graph::router::dijkstra dr(graph);
+    static auto choose_router = [](const algorithm alg, const grid_graph& g) 
+        -> std::unique_ptr<graph::router::router<grid_type>>
+    {
+        switch (alg) {
+            case algorithm::dijkstra:
+                return std::make_unique<graph::router::dijkstra<grid_type>>(g);
+            default:
+                return nullptr;
+        }
+        return nullptr;
+    };
+
+    const auto [graph, start, end] = create_graph(_grid);
+    const auto router = choose_router(_toolbar->current_algorithm(), graph);
+    if (!router) return;
+
+    const auto route = router->calc(start, end);
+    log_route(route);
+    for (auto n : route) {
+    }
 }
 
 void main_frame::_register_connections() {

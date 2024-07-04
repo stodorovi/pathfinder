@@ -10,10 +10,11 @@ namespace router {
 ARITMETIC_T
 class dijkstra : public router<T> {
 public:
-    dijkstra(graph<T>& graph) : router<T>(graph) {}
+    dijkstra(const graph<T>& graph) : router<T>(graph) {}
+    ~dijkstra() {}
 
     using router<T>::calc;
-    router<T>::route calc(types::point<T> start, types::point<T> end) override {
+    router<T>::route calc(types::point<T> start, types::point<T> end) const override {
         auto start_node = this->_graph.node_by_pos(start);
         auto end_node = this->_graph.node_by_pos(end);
 
