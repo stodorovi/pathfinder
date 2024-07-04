@@ -31,8 +31,11 @@ private:
             if (!_node_lookup_table.contains(top_node->pos()))
                 _node_lookup_table[top_node->pos()] = top_node;
 
-            for (auto& e : top_node->edges())
-                next_nodes.push(e.node);
+            for (auto& e : top_node->edges()) {
+                auto node = e.node;
+                if (_node_lookup_table.contains(node->pos())) continue;
+                    next_nodes.push(e.node);
+            }
 
             next_nodes.pop();
         }
