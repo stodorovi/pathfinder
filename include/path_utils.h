@@ -8,6 +8,6 @@ inline std::filesystem::path& app_dir() {
 }
 
 inline std::string icon_path(const char* icon_name) {
-    return std::format("{}/resources/icons/{}", app_dir().c_str(), icon_name);
+    return std::format("{}/resources/icons/{}", app_dir().string(), icon_name);
 }
 } // end namespace path
