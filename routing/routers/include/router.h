@@ -41,7 +41,7 @@ struct route {
 };
 
 protected:
-    const graph<T>& _graph;
+    graph<T>& _graph;
 
     struct unvisited_node {
         components::node_ptr<T> node;
@@ -110,7 +110,7 @@ protected:
     }
 
 public:
-    router(const graph<T>& graph) : _graph(graph) {};
+    router(graph<T>& graph) : _graph(graph) {};
     virtual ~router() {};
 
     virtual route calc(types::point<T> start, types::point<T> end) const = 0;
@@ -120,7 +120,7 @@ public:
     }
 
     void reset(graph<T>& graph) {
-        _graph(graph);
+        _graph = graph;
     }
 };
 } // end namespace router

@@ -19,6 +19,7 @@ private:
 public:
     node() : _pos(), _edges() {}
     node(types::point<T> p) : _pos(p), _edges() {}
+    node(T x, T y) : _pos(types::point(x, y)), _edges() {}
 
     types::point<T> pos() {
         return _pos;

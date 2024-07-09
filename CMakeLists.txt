@@ -5,6 +5,8 @@ project(PathFinderApp
     LANGUAGES CXX
 )
 
+add_subdirectory(routing/tests)
+
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6

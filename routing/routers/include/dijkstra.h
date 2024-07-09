@@ -10,7 +10,7 @@ namespace router {
 ARITMETIC_T
 class dijkstra : public router<T> {
 public:
-    dijkstra(const graph<T>& graph) : router<T>(graph) {}
+    dijkstra(graph<T>& graph) : router<T>(graph) {}
     ~dijkstra() {}
 
     using router<T>::calc;
