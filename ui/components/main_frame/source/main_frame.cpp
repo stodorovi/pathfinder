@@ -163,7 +163,7 @@ void main_frame::_on_cell_click(QTableWidgetItem* i) {
 }
 
 void main_frame::_run_algorithm() {
-    static auto choose_router = [](const algorithm alg, const grid_graph& g) 
+    static auto choose_router = [](const algorithm alg, grid_graph& g) 
         -> std::unique_ptr<graph::router::router<grid_type>>
     {
         switch (alg) {
@@ -175,7 +175,7 @@ void main_frame::_run_algorithm() {
         return nullptr;
     };
 
-    const auto [graph, start, end] = create_graph(_grid);
+    auto [graph, start, end] = create_graph(_grid);
     const auto router = choose_router(_toolbar->current_algorithm(), graph);
     if (!router) return;
 
