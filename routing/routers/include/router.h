@@ -106,7 +106,7 @@ protected:
             }
         }
 
-        return { first_node, this->_route_len(first_node), vo };
+        return { first_node, this->_route_len(first_node), std::move(vo) };
     }
 
 public:

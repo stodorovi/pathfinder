@@ -52,7 +52,7 @@ public:
             visited.insert(current_unvisited_node.node);
             
             if (current_unvisited_node.node == end_node)
-                return this->_construct_route(current_unvisited_node, visitation_order);
+                return this->_construct_route(current_unvisited_node, std::move(visitation_order));
 
             current_unvisited_node = unvisited_set.top();
         }
