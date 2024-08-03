@@ -7,14 +7,16 @@
 #include "../../../../routing/components/include/graph.h"
 #include "../../../../routing/components/include/edge_helper.h"
 #include "../../../../routing/routers/include/dijkstra.h"
+#include "ui/components/grid/include/cell.h"
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QGraphicsDropShadowEffect>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 
 #include <format>
-#include <queue>
+#include <utility>
 
 using grid_type = int32_t;
 using grid_point = graph::types::point<grid_type>;
@@ -120,6 +122,24 @@ void log_route(auto& route) {
     printf("%s", log.append(std::format("LEN: {}\n", route.length)).c_str());
 }
 
+void toggle_cell_state_buttons(toolbar& t, cell_state& current, cell_state to_set) {
+    static auto state_to_btn = [&t](cell_state s) -> icon_button* {
+        switch (s) {
+            case cell_state::start: return t.start_position_btn();
+            case cell_state::end: return t.end_position_btn();
+            case cell_state::untraversable: return t.untraversable_node_button();
+            case cell_state::empty: return nullptr;
+        }
+    };
+
+    icon_button* before = state_to_btn(current);
+    current = toggle_state(current, to_set);
+    icon_button* after = state_to_btn(current);
+    
+    if  (before) before->setEnabled(true);
+    after->setEnabled(false);
+}
+
 } // end anonymous namespace
 
 main_frame::main_frame() : QMainWindow(),
@@ -195,13 +215,13 @@ void main_frame::_register_connections() {
 }
 
 void main_frame::_on_start_position_btn_click() {
-    _cell_set_state = toggle_state(_cell_set_state, cell_state::start);
+    toggle_cell_state_buttons(*_toolbar, _cell_set_state, cell_state::start);
 }
 
 void main_frame::_on_end_position_btn_click() {
-    _cell_set_state = toggle_state(_cell_set_state, cell_state::end);
+    toggle_cell_state_buttons(*_toolbar, _cell_set_state, cell_state::end);
 }
 
 void main_frame::_on_untraversable_node_button_click() {
-    _cell_set_state = toggle_state(_cell_set_state, cell_state::untraversable);
+    toggle_cell_state_buttons(*_toolbar, _cell_set_state, cell_state::untraversable);
 }
