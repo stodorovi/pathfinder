@@ -41,7 +41,7 @@ public:
 
             for (auto& e : current_unvisited_node.node->edges()) {
                 auto un = unvisited_node{
-                    e.node, e.weight, std::make_shared<unvisited_node>(current_unvisited_node)
+                    e.node, e.weight + current_unvisited_node.weight, std::make_shared<unvisited_node>(current_unvisited_node)
                 };
                 if (!visited.contains(un.node)) {
                     unvisited_set.push(un);
