@@ -75,8 +75,10 @@ create_nodes(grid const * const g) {
             if (const auto* cl = (cell*)g->item(r, c); cl && cl->state() != cell_state::untraversable) {
                 auto n = std::make_unique<grid_node>(grid_point{ c, r });
                 const grid_point npos = n->pos();
-                if (cl->state() == cell_state::start) start = npos;
-                else if (cl->state() == cell_state::end) end = npos;
+                if (cl->state() == cell_state::start)
+                    start = npos;
+                else if (cl->state() == cell_state::end)
+                    end = npos;
                 nodes[r][c] = std::move(n);
             }
         }

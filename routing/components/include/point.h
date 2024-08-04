@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <utility>
 
 namespace graph {
 namespace types {
@@ -13,8 +14,8 @@ ARITMETIC_T struct point {
 private:
     // Bottom-left to top-right
     auto _compare(const point& r) const {
-        if (x > r.x || y > r.y) return 1;
-        else if (x < r.x || y < r.y) return -1;
+        if (x < r.x || (x == r.x && y < r.y)) return -1;
+        else if (x > r.x || (x == r.x && y < r.y)) return 1;
         else return 0;
     }
 
@@ -85,3 +86,12 @@ public:
 };
 } // end namespace types
 } // end namespace graph
+
+template<typename T>
+struct std::hash<graph::types::point<T>> {
+    std::size_t operator()(const graph::types::point<T>& pt) const noexcept {
+        std::size_t h1 = std::hash<T>{}(pt.x);
+        std::size_t h2 = std::hash<T>{}(pt.y);
+        return h1 ^ (h2 << 1);
+    }
+};

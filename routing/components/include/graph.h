@@ -3,8 +3,8 @@
 #include "node.h"
 #include "edge.h"
 
-#include <map>
 #include <queue>
+#include <unordered_map>
 
 namespace graph {
 ARITMETIC_T
@@ -14,7 +14,7 @@ ARITMETIC_T class graph {
 private:
     node_ptr<T> _origin_node;
 
-    using node_table_t = std::map<types::point<T>, node_ptr<T>>;
+    using node_table_t = std::unordered_map<types::point<T>, node_ptr<T>>;
     node_table_t _node_lookup_table;
 
     void init() {
