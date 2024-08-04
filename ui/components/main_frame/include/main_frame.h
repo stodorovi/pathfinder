@@ -12,7 +12,10 @@ class main_frame : public QMainWindow {
 private:
     toolbar* _toolbar;
     grid* _grid;
+
     cell_state _cell_set_state;
+    cell* _start_cell;
+    cell* _end_cell;
 
     void _create_new_grid();
     void _on_cell_click(QTableWidgetItem*);

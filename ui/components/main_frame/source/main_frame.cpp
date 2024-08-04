@@ -143,7 +143,8 @@ void toggle_cell_state_buttons(toolbar& t, cell_state& current, cell_state to_se
 } // end anonymous namespace
 
 main_frame::main_frame() : QMainWindow(),
-    _toolbar(new toolbar()), _grid(nullptr), _cell_set_state(cell_state::empty)
+    _toolbar(new toolbar()), _grid(nullptr), _cell_set_state(cell_state::empty),
+    _start_cell(nullptr), _end_cell(nullptr)
 {
     this->addToolBar(_toolbar);
     setGeometry(desktop_centre(640, 480));
@@ -162,24 +163,29 @@ void main_frame::_create_new_grid() {
     setCentralWidget(_grid);
 
     if (_grid) connect(_grid, &grid::itemClicked, this, &main_frame::_on_cell_click);
+    _start_cell = nullptr;
+    _end_cell = nullptr;
 }
 
-void main_frame::_on_cell_click(QTableWidgetItem* i) {
-    static cell* start_cell = nullptr;
-    static cell* end_cell = nullptr;
-
+void main_frame::_on_cell_click(QTableWidgetItem* i) {   
     cell* c = (cell*)i;
+    
     if (_cell_set_state == cell_state::start) {
-        if (start_cell && start_cell != c) start_cell->state(cell_state::empty);
-        start_cell = c;
+        if (_start_cell) _start_cell->state(cell_state::empty);
+        _start_cell = c;
+        if (c == _end_cell) _end_cell = nullptr;
+    }
+    else if (_cell_set_state == cell_state::end) {
+        if (_end_cell) _end_cell->state(cell_state::empty);
+        if (c == _start_cell) _start_cell = nullptr;
+        _end_cell = c;
+    }
+    else {
+        if (c == _start_cell) _start_cell = nullptr;
+        else if (c == _end_cell) _end_cell = nullptr;
     }
 
-    if (_cell_set_state == cell_state::end) {
-        if (end_cell && end_cell != c) end_cell->state(cell_state::empty);
-        end_cell = c;
-    }
-
-    c->state(_cell_set_state);
+    c->state(toggle_state(c->state(), _cell_set_state));
 }
 
 void main_frame::_run_algorithm() {
