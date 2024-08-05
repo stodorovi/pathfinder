@@ -7,6 +7,8 @@
 #include "../../../../routing/components/include/graph.h"
 #include "../../../../routing/components/include/edge_helper.h"
 #include "../../../../routing/routers/include/dijkstra.h"
+#include "../../../../routing/routers/include/a_star.h"
+#include "include/algorithms.h"
 #include "ui/components/grid/include/cell.h"
 
 #include <QtWidgets/QWidget>
@@ -16,6 +18,7 @@
 #include <QtGui/QScreen>
 
 #include <format>
+#include <memory>
 #include <utility>
 
 using grid_type = int32_t;
@@ -146,6 +149,8 @@ std::unique_ptr<graph::router::router<grid_type>> choose_router(const algorithm 
     switch (alg) {
         case algorithm::dijkstra:
             return std::make_unique<graph::router::dijkstra<grid_type>>(g);
+        case algorithm::a_star:
+            return std::make_unique<graph::router::a_star<grid_type>>(g);
         default:
             return nullptr;
     }
