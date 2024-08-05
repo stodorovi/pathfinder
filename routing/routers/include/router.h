@@ -113,11 +113,7 @@ public:
     router(graph<T>& graph) : _graph(graph) {};
     virtual ~router() {};
 
-    virtual route calc(types::point<T> start, types::point<T> end) const = 0;
-    
-    route calc(components::node_ptr<T> start, components::node_ptr<T> end) const {
-        return this->calc(start->pos(), end->pos());
-    }
+    virtual route calc(types::point<T> start, types::point<T> end) = 0;
 
     void reset(graph<T>& graph) {
         _graph = graph;

@@ -1,17 +1,27 @@
 #pragma once
 
 #include "router.h"
+#include "dijkstra.h"
 
-#include <algorithm>
 #include <queue>
 
 namespace graph {
 namespace router {
 ARITMETIC_T
-class dijkstra : public router<T> {
+class a_star : public router<T> {
+protected:
+    dijkstra<T> _dr;
+
+    components::weight_t _heuristic_weight(
+        components::node_ptr<T> node, components::node_ptr<T> end_node, components::edge<T>& e
+    ) {
+        auto route = _dr.calc(e.node->pos(), end_node->pos());
+        return e.weight + route.length;
+    }
+
 public:
-    dijkstra(graph<T>& graph) : router<T>(graph) {}
-    ~dijkstra() {}
+    a_star(graph<T>& graph) : router<T>(graph), _dr(graph)
+    {}
 
     using router<T>::calc;
     router<T>::route calc(types::point<T> start, types::point<T> end) override {
@@ -40,8 +50,9 @@ public:
             unvisited_set.pop();
 
             for (auto& e : current_unvisited_node.node->edges()) {
+                auto weight = this->_heuristic_weight(current_unvisited_node.node, end_node, e);
                 auto un = unvisited_node{
-                    e.node, e.weight + current_unvisited_node.weight, std::make_shared<unvisited_node>(current_unvisited_node)
+                    e.node, weight + current_unvisited_node.weight , std::make_shared<unvisited_node>(current_unvisited_node)
                 };
                 if (!visited.contains(un.node)) {
                     unvisited_set.push(un);
@@ -50,9 +61,9 @@ public:
 
             visitation_order.push_back(current_unvisited_node.node);
             visited.insert(current_unvisited_node.node);
-            
+
             if (current_unvisited_node.node == end_node)
-                return this->_construct_route(current_unvisited_node, std::move(visitation_order));
+                return this->_construct_route(current_unvisited_node, visitation_order);
 
             current_unvisited_node = unvisited_set.top();
         }

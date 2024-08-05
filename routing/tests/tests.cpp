@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "../routers/include/dijkstra.h"
+#include "../routers/include/a_star.h"
 
 ARITMETIC_T
 std::string points_print(const std::vector<graph::types::point<T>>& points) {
@@ -179,7 +180,7 @@ void test_dijkstra() {
         graph::types::point(0, 0),
         graph::types::point(11, 11),
         graph::types::point(22, 22) },
-        "dijkstra"
+        "Dijkstra | small graph"
     );
 
     auto gg = grid_graph();
@@ -190,11 +191,29 @@ void test_dijkstra() {
         graph::types::point(1, 1),
         graph::types::point(2, 2),
         graph::types::point(3, 3) },
-        "dijkstra"
+        "Dijkstra | grid graph"
     );
 
 }
 
+void test_a_star() {
+    auto g = grid_graph();
+
+    graph::router::dijkstra<int> dr(g);
+    graph::router::a_star<int> ar(g);
+
+    auto dijkstra_route = dr.calc(graph::types::point(0, 0), graph::types::point(3, 3));
+    auto a_star_route = ar.calc(graph::types::point(0, 0), graph::types::point(3, 3));
+
+    test_route(a_star_route.node, dijkstra_route.node, "A* == Dijkstra route | grid graph"
+    );
+    test_len<std::less<size_t>>(
+        a_star_route.visitation_order.size(), dijkstra_route.visitation_order.size(),
+        "A* smaller visitation size than Dijkstra | grid graph", "<"
+    );
+}
+
 int main() {
     test_dijkstra();
+    test_a_star();
 }
