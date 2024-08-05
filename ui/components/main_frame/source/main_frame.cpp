@@ -142,6 +142,16 @@ void toggle_cell_state_buttons(toolbar& t, cell_state& current, cell_state to_se
     after->setEnabled(false);
 }
 
+std::unique_ptr<graph::router::router<grid_type>> choose_router(const algorithm alg, grid_graph& g) {
+    switch (alg) {
+        case algorithm::dijkstra:
+            return std::make_unique<graph::router::dijkstra<grid_type>>(g);
+        default:
+            return nullptr;
+    }
+    return nullptr;
+};
+
 } // end anonymous namespace
 
 main_frame::main_frame() : QMainWindow(),
@@ -191,25 +201,14 @@ void main_frame::_on_cell_click(QTableWidgetItem* i) {
 }
 
 void main_frame::_run_algorithm() {
-    static auto choose_router = [](const algorithm alg, grid_graph& g) 
-        -> std::unique_ptr<graph::router::router<grid_type>>
-    {
-        switch (alg) {
-            case algorithm::dijkstra:
-                return std::make_unique<graph::router::dijkstra<grid_type>>(g);
-            default:
-                return nullptr;
-        }
-        return nullptr;
-    };
-
     auto [graph, start, end] = create_graph(_grid);
-    const auto router = choose_router(_toolbar->current_algorithm(), graph);
-    if (!router) return;
-
-    const auto route = router->calc(start, end);
-    log_route(route);
-    for (auto n : route) {
+    if (const auto router = choose_router(_toolbar->current_algorithm(), graph); router) {
+        const auto route = router->calc(start, end);
+#if !NDEBUG
+        log_route(route);
+#endif
+        for (auto n : route) {
+        }
     }
 }
 
