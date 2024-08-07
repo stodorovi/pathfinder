@@ -14,6 +14,7 @@
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QGraphicsDropShadowEffect>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 
@@ -67,8 +68,8 @@ std::tuple<std::vector<std::vector<grid_node_ptr>>, grid_point, grid_point>
 create_nodes(grid const * const g) {
     const int32_t rows = g->rowCount();
     std::vector<std::vector<grid_node_ptr>> nodes(rows);
-    grid_point start;
-    grid_point end;
+    grid_point start { -1, -1 };
+    grid_point end { -1, -1 };
 
     const int32_t columns = g->columnCount();
     for (int32_t r = 0; r < rows; ++r) {
@@ -157,6 +158,16 @@ std::unique_ptr<graph::router::router<grid_type>> choose_router(const algorithm 
     return nullptr;
 };
 
+void show_invalid_start_end_message(const bool start_invalid, const bool end_invalid) {
+    const auto error_message = [start_invalid, end_invalid]() {
+        if (start_invalid && !end_invalid) return QString("Start node not selected!");
+        else if (start_invalid && end_invalid) return QString("Neither start nor end node selected!");
+        else return QString("End node not selected!");
+    }();
+    QMessageBox msgbox(QMessageBox::Icon::Critical, "Invalid endpoint", "ERROR: " + error_message);
+    msgbox.exec();
+}
+
 } // end anonymous namespace
 
 main_frame::main_frame() : QMainWindow(),
@@ -206,7 +217,14 @@ void main_frame::_on_cell_click(QTableWidgetItem* i) {
 }
 
 void main_frame::_run_algorithm() {
+    static const grid_point invalid_point { -1, -1 };
+
     auto [graph, start, end] = create_graph(_grid);
+    
+    const bool invalid_start = start == invalid_point;
+    const bool invalid_end = end == invalid_point;
+    if (invalid_start || invalid_end) show_invalid_start_end_message(invalid_start, invalid_end);
+
     if (const auto router = choose_router(_toolbar->current_algorithm(), graph); router) {
         const auto route = router->calc(start, end);
 #if !NDEBUG
