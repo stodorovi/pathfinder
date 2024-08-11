@@ -168,6 +168,11 @@ void show_invalid_start_end_message(const bool start_invalid, const bool end_inv
     msgbox.exec();
 }
 
+void show_route_not_found_message() {
+    QMessageBox msgbox(QMessageBox::Icon::Critical, "Route not found!", "ERROR: Route was not found.");
+    msgbox.exec();
+}
+
 } // end anonymous namespace
 
 main_frame::main_frame() : QMainWindow(),
@@ -223,13 +228,21 @@ void main_frame::_run_algorithm() {
     
     const bool invalid_start = start == invalid_point;
     const bool invalid_end = end == invalid_point;
-    if (invalid_start || invalid_end) show_invalid_start_end_message(invalid_start, invalid_end);
+    if (invalid_start || invalid_end) {
+        show_invalid_start_end_message(invalid_start, invalid_end);
+        return;
+    }
 
     if (const auto router = choose_router(_toolbar->current_algorithm(), graph); router) {
         const auto route = router->calc(start, end);
+
 #if !NDEBUG
         log_route(route);
 #endif
+
+        if (!route)
+            show_route_not_found_message();
+
         for (auto n : route) {
         }
     }

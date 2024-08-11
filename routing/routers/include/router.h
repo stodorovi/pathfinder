@@ -38,6 +38,10 @@ struct route {
 
     route_iterator begin() const { return { node }; }
     route_iterator_sentinel end() const { return {}; }
+    
+    explicit operator bool() const {
+        return node != nullptr;
+    }
 };
 
 protected:
