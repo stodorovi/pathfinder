@@ -173,6 +173,11 @@ void show_route_not_found_message() {
     msgbox.exec();
 }
 
+void show_empty_grid_error_message() {
+    QMessageBox msgbox(QMessageBox::Icon::Critical, "Emptz grid!", "ERROR: The grid is empty. Create a grid to route.");
+    msgbox.exec();
+}
+
 } // end anonymous namespace
 
 main_frame::main_frame() : QMainWindow(),
@@ -222,6 +227,11 @@ void main_frame::_on_cell_click(QTableWidgetItem* i) {
 }
 
 void main_frame::_run_algorithm() {
+    if (!_grid) {
+        show_empty_grid_error_message();
+        return;
+    }
+
     static const grid_point invalid_point { -1, -1 };
 
     auto [graph, start, end] = create_graph(_grid);
