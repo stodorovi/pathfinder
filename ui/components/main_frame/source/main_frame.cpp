@@ -11,6 +11,7 @@
 #include "include/algorithms.h"
 #include "ui/components/grid/include/cell.h"
 
+#include <QtConcurrent/QtConcurrent>
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QGraphicsDropShadowEffect>
@@ -18,6 +19,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 
+#include <chrono>
 #include <format>
 #include <memory>
 #include <utility>
@@ -250,18 +252,27 @@ void main_frame::_run_algorithm() {
         log_route(route);
 #endif
 
-        if (!route)
-            show_route_not_found_message();
-
-        for (auto n : route) {
-        }
+    if (!route) {
+        show_route_not_found_message();
+        return;
     }
+
+    _toolbar->setEnabled(false);
+
+    auto _ = QtConcurrent::run([route = std::move(route), this](){
+        for (auto n : route) {
+            printf("\n %d - %d \n", n.x, n.y);
+            QThread::sleep(std::chrono::milliseconds(500));
+        }
+        
+        _toolbar->setEnabled(true);
+    });
+}
 }
 
 void main_frame::_register_connections() {
     connect(_toolbar->new_grid_btn(), &QPushButton::released, this, &main_frame::_create_new_grid);
     connect(_toolbar->run_algorithm_btn(), &QPushButton::released, this, &main_frame::_run_algorithm);
-
     connect(_toolbar->start_position_btn(), &QPushButton::released, this, &main_frame::_on_start_position_btn_click);
     connect(_toolbar->end_position_btn(), &QPushButton::released, this, &main_frame::_on_end_position_btn_click);
     connect(_toolbar->untraversable_node_button(), &QPushButton::released, this, &main_frame::_on_untraversable_node_button_click);
