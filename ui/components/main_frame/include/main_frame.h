@@ -3,12 +3,16 @@
 #include <QtWidgets/QMainWindow>
 #include "../../grid/include/grid.h"
 #include "../../grid/include/cell.h"
+#include "../../../routing/routers/include/router.h"
 
 class toolbar;
 
 class main_frame : public QMainWindow {
     Q_OBJECT
     
+public:
+using grid_type = grid::cell_type;
+
 private:
     toolbar* _toolbar;
     grid* _grid;
@@ -21,6 +25,7 @@ private:
     void _on_cell_click(QTableWidgetItem*);
 
     void _run_algorithm();
+    void _visualise_algorithm(const graph::route<grid_type>& r);
 
     void _register_connections();
 

@@ -20,11 +20,13 @@
 #include <QtGui/QScreen>
 
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <format>
 #include <memory>
 #include <utility>
 
-using grid_type = int32_t;
+using grid_type = main_frame::grid_type;
 using grid_point = graph::types::point<grid_type>;
 using grid_node = graph::components::node<grid_type>;
 using grid_node_ptr = graph::node_ptr<grid_type>;
@@ -260,14 +262,49 @@ void main_frame::_run_algorithm() {
     _toolbar->setEnabled(false);
 
     auto _ = QtConcurrent::run([route = std::move(route), this](){
-        for (auto n : route) {
-            printf("\n %d - %d \n", n.x, n.y);
-            QThread::sleep(std::chrono::milliseconds(500));
-        }
-        
-        _toolbar->setEnabled(true);
+        this->_visualise_algorithm(route);
     });
 }
+}
+
+void main_frame::_visualise_algorithm(const graph::route<grid_type>& r) {
+    const size_t visitation_count = r.visitation_order.size();
+    auto to_colour = [visitation_count](const size_t cell_n) {
+        uint8_t max_color = 0xff;
+        const size_t cells_left = visitation_count - cell_n;
+        double visitation_count_d = double(visitation_count);
+
+        int32_t blue = (cells_left / visitation_count_d) * max_color;
+        int32_t green = max_color - blue;
+        QColor c(0, green, blue);
+        
+        QBrush brush;
+        brush.setColor(c);
+        brush.setStyle(Qt::SolidPattern);
+        return brush;
+    };
+
+    const auto cell_paint_duration = std::chrono::milliseconds(500);
+    for (size_t i = 0; i < visitation_count; ++i) {
+        auto& node = *r.visitation_order[i];
+        const auto pt = node.pos();
+        if (auto* cl = (cell*)_grid->item(pt.y, pt.x); cl) {
+            const auto colour = to_colour(i);
+            cl->setBackground(colour);
+            QThread::sleep(cell_paint_duration);
+        }
+    }
+    
+    QThread::sleep(std::chrono::seconds(1));
+    
+    for (auto pt : r) {
+        if (auto* cl = (cell*)_grid->item(pt.y, pt.x); cl) {
+            cl->setBackground(Qt::red);
+            QThread::sleep(cell_paint_duration);
+        }
+    }
+        
+    _toolbar->setEnabled(true);
 }
 
 void main_frame::_register_connections() {

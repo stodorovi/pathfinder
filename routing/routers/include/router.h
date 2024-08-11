@@ -8,27 +8,24 @@
 #include <set>
 
 namespace graph {
-namespace router {
-ARITMETIC_T class router {
-public:
-struct route {
 
+ARITMETIC_T struct route {
     struct route_iterator_sentinel{};
     class route_iterator {
-    private:
-        components::node_ptr<T> _node;
+        private:
+            components::node_ptr<T> _node;
 
-    public:
-        route_iterator(components::node_ptr<T> n) : _node(std::move(n)) {}
-        bool operator==(route_iterator_sentinel) const { return _node == nullptr; }
-        route_iterator& operator++() {
-            _node = (_node && !_node->edges().empty())
-                ? _node->edges().front().node
-                : nullptr
-            ;
-            return *this;
-        }
-        types::point<T> operator*() { return _node->pos(); }
+        public:
+            route_iterator(components::node_ptr<T> n) : _node(std::move(n)) {}
+            bool operator==(route_iterator_sentinel) const { return _node == nullptr; }
+            route_iterator& operator++() {
+                _node = (_node && !_node->edges().empty())
+                    ? _node->edges().front().node
+                    : nullptr
+                ;
+                return *this;
+            }
+            types::point<T> operator*() { return _node->pos(); }
     };
 
     components::node_ptr<T> node;
@@ -38,12 +35,15 @@ struct route {
 
     route_iterator begin() const { return { node }; }
     route_iterator_sentinel end() const { return {}; }
-    
+
     explicit operator bool() const {
         return node != nullptr;
     }
 };
 
+namespace router {
+ARITMETIC_T class router {
+using route_t = route<T>;
 protected:
     graph<T>& _graph;
 
@@ -85,7 +85,7 @@ protected:
         return len;
     }
 
-    route _construct_route(unvisited_node n, route::route_visitation_order vo) const {
+    route_t _construct_route(unvisited_node n, route_t::route_visitation_order vo) const {
         std::vector<components::node_ptr<T>> route_nodes;
         unvisited_node* current_node_ptr = &n;
         do {
@@ -117,7 +117,7 @@ public:
     router(graph<T>& graph) : _graph(graph) {};
     virtual ~router() {};
 
-    virtual route calc(types::point<T> start, types::point<T> end) = 0;
+    virtual route_t calc(types::point<T> start, types::point<T> end) = 0;
 
     void reset(graph<T>& graph) {
         _graph = graph;

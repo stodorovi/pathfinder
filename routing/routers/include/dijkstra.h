@@ -9,12 +9,13 @@ namespace graph {
 namespace router {
 ARITMETIC_T
 class dijkstra : public router<T> {
+using route_t = route<T>;
 public:
     dijkstra(graph<T>& graph) : router<T>(graph) {}
     ~dijkstra() {}
 
     using router<T>::calc;
-    router<T>::route calc(types::point<T> start, types::point<T> end) override {
+    route_t calc(types::point<T> start, types::point<T> end) override {
         auto start_node = this->_graph.node_by_pos(start);
         auto end_node = this->_graph.node_by_pos(end);
 
@@ -34,7 +35,7 @@ public:
         unvisited_set.push(start_un);
 
         std::set<node_ptr<T>> visited;
-        typename router<T>::route::route_visitation_order visitation_order;
+        typename route_t::route_visitation_order visitation_order;
 
         while (unvisited_set.size()) {
             unvisited_set.pop();
