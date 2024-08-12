@@ -97,10 +97,7 @@ create_nodes(grid const * const g) {
 }
 
 grid_graph connect_graph(grid const * const g, std::vector<std::vector<grid_node_ptr>> nodes) {
-    grid_graph rv(nullptr);
-
     grid_node_ptr origin_node = nullptr;
-
     for (auto& row : nodes) {
         for (auto& node : row) {
             if (!node) continue;
@@ -114,9 +111,7 @@ grid_graph connect_graph(grid const * const g, std::vector<std::vector<grid_node
             }
         }
     }
-
-    rv.reset(origin_node);
-    return rv;
+    return grid_graph(origin_node);
 }
 
 std::tuple<grid_graph, grid_point, grid_point> create_graph(grid const * const g) {

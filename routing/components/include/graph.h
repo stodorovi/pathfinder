@@ -2,56 +2,63 @@
 
 #include "node.h"
 #include "edge.h"
+#include "routing/components/include/point.h"
 
+#include <set>
 #include <queue>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace graph {
 ARITMETIC_T
 using node_ptr = std::shared_ptr<components::node<T>>;
 
 ARITMETIC_T class graph {
-private:
-    node_ptr<T> _origin_node;
+public:
+    using node_ptr_t = node_ptr<T>;
+    using point_t = types::point<T>;
 
-    using node_table_t = std::unordered_map<types::point<T>, node_ptr<T>>;
+private:
+    node_ptr_t _origin_node;
+
+    using node_table_t = std::unordered_map<point_t, node_ptr_t>;
     node_table_t _node_lookup_table;
 
-    void init() {
+    void _init_lookup_table() {
         this->_node_lookup_table.clear();
         if (!this->_origin_node) return;
 
-        std::queue<node_ptr<T>> next_nodes;
+        std::queue<node_ptr_t> next_nodes;
         next_nodes.push(_origin_node);
+        std::unordered_set<point_t> visited;
+        visited.insert(_origin_node->pos());
 
         while (next_nodes.size()) {
-            auto top_node = next_nodes.front();
-
-            bool contains = _node_lookup_table.contains(top_node->pos());
-            if (!_node_lookup_table.contains(top_node->pos()))
-                _node_lookup_table[top_node->pos()] = top_node;
-
-            for (auto& e : top_node->edges()) {
-                auto node = e.node;
-                if (_node_lookup_table.contains(node->pos())) continue;
-                    next_nodes.push(e.node);
-            }
-
+            auto node = next_nodes.front();
             next_nodes.pop();
+            _node_lookup_table[node->pos()] = node;
+
+            for (auto& e : node->edges()) {
+                const auto pt = e.node->pos();
+                if (!visited.contains(pt)) {
+                    next_nodes.emplace(e.node);
+                    visited.insert(pt);
+                }
+            }
         }
     }
 
 public:
-    graph(node_ptr<T> origin_node) : _origin_node(origin_node) {
-        init();
+    graph(node_ptr_t origin_node) : _origin_node(origin_node) {
+        _init_lookup_table();
     }
 
-    void reset(node_ptr<T> node) {
+    void reset(node_ptr_t node) {
         _origin_node = node;
-        init();
+        _init_lookup_table();
     }
 
-    node_ptr<T> node_by_pos(types::point<T> pt) const {
+    node_ptr_t node_by_pos(point_t pt) const {
         if (_node_lookup_table.contains(pt))
             return _node_lookup_table.at(pt);
 
