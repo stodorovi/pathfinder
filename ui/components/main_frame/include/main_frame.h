@@ -21,6 +21,10 @@ private:
     cell* _start_cell;
     cell* _end_cell;
 
+    std::vector<std::vector<cell_state>> _grid_states;
+    void _set_grid_states();
+    void _restore_grid_states();
+
     void _create_new_grid();
     void _on_cell_click(QTableWidgetItem*);
 

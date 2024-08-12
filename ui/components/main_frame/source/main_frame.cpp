@@ -25,6 +25,7 @@
 #include <format>
 #include <memory>
 #include <utility>
+#include <vector>
 
 using grid_type = main_frame::grid_type;
 using grid_point = graph::types::point<grid_type>;
@@ -195,6 +196,37 @@ main_frame::main_frame() : QMainWindow(),
     _register_connections();
 }
 
+void main_frame::_set_grid_states() {
+    _grid_states.clear();
+
+    const size_t rows = _grid->rowCount();
+    const size_t columns = _grid->columnCount();
+
+    for (size_t r = 0; r < rows; ++r) {
+        _grid_states.emplace_back(std::vector<cell_state>(columns));
+        for (size_t c = 0; c < columns; ++c) {
+            _grid_states[r][c] = static_cast<cell*>(_grid->item(r, c))->state();
+        }
+    }
+}
+
+void main_frame::_restore_grid_states() {
+    if (_grid_states.empty())
+        return;
+
+    const size_t rows = _grid->rowCount();
+    const size_t columns = _grid->columnCount();
+
+    for (size_t r = 0; r < rows; ++r) {
+        for (size_t c = 0; c < columns; ++c) {
+            cell* cl = (cell*)_grid->item(r, c);
+            cl->state(_grid_states[r][c], true);
+        }
+    }
+
+    _grid_states.clear();
+}
+
 void main_frame::_create_new_grid() {
     grid_creation_dialog d;
     d.exec();
@@ -207,9 +239,13 @@ void main_frame::_create_new_grid() {
     if (_grid) connect(_grid, &grid::itemClicked, this, &main_frame::_on_cell_click);
     _start_cell = nullptr;
     _end_cell = nullptr;
+    _grid_states.clear();
 }
 
-void main_frame::_on_cell_click(QTableWidgetItem* i) {   
+void main_frame::_on_cell_click(QTableWidgetItem* i) {  
+    if (!_grid_states.empty())
+        _restore_grid_states();
+
     cell* c = (cell*)i;
     
     if (_cell_set_state == cell_state::start) {
@@ -261,7 +297,11 @@ void main_frame::_run_algorithm() {
 
     _toolbar->setEnabled(false);
 
+    if (!_grid_states.empty())
+        _restore_grid_states();
+    
     auto _ = QtConcurrent::run([route = std::move(route), this](){
+        this->_set_grid_states();
         this->_visualise_algorithm(route);
     });
 }

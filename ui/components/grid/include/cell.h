@@ -20,8 +20,9 @@ private:
     
 public:
     cell_state state() const { return _state; }
-    void state(cell_state s) {
-        _state = toggle_state(_state, s);
+    void state(cell_state s, bool force = false) {
+        if (!force)
+            _state = toggle_state(_state, s);
 
         static auto to_color = [](cell_state cs) {
             switch (cs) {
