@@ -2,9 +2,8 @@
 
 #include "node.h"
 #include "edge.h"
-#include "routing/components/include/point.h"
+#include "point.h"
 
-#include <set>
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
