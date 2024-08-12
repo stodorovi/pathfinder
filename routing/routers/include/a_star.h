@@ -66,6 +66,9 @@ public:
             if (current_unvisited_node.node == end_node)
                 return this->_construct_route(current_unvisited_node, visitation_order);
 
+            while(visited.contains(unvisited_set.top().node))
+                unvisited_set.pop();
+
             current_unvisited_node = unvisited_set.top();
         }
 

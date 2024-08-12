@@ -44,6 +44,7 @@ public:
                 auto un = unvisited_node{
                     e.node, e.weight + current_unvisited_node.weight, std::make_shared<unvisited_node>(current_unvisited_node)
                 };
+                const bool already_visited = visited.contains(e.node);
                 if (!visited.contains(un.node)) {
                     unvisited_set.push(un);
                 }
@@ -54,6 +55,9 @@ public:
             
             if (current_unvisited_node.node == end_node)
                 return this->_construct_route(current_unvisited_node, std::move(visitation_order));
+            
+            while(visited.contains(unvisited_set.top().node))
+                unvisited_set.pop();
 
             current_unvisited_node = unvisited_set.top();
         }
