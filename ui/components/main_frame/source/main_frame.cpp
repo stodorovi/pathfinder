@@ -178,6 +178,57 @@ void show_empty_grid_error_message() {
     msgbox.exec();
 }
 
+void visualise_visitation_order(const graph::route<grid_type>::route_visitation_order& to, grid& g, std::chrono::seconds paint_duration) {
+    const size_t visitation_count = to.size();
+    auto to_colour = [visitation_count](const size_t cell_n) {
+        uint8_t max_color = 0xff;
+        const size_t cells_left = visitation_count - cell_n;
+        double visitation_count_d = double(visitation_count);
+
+        int32_t blue = (cells_left / visitation_count_d) * max_color;
+        int32_t green = max_color - blue;
+        QColor c(0, green, blue);
+        
+        QBrush brush;
+        brush.setColor(c);
+        brush.setStyle(Qt::SolidPattern);
+        return brush;
+    };
+
+    const auto cell_paint_duration = std::chrono::duration_cast<std::chrono::milliseconds>(paint_duration) / visitation_count;
+    for (size_t i = 0; i < visitation_count; ++i) {
+        auto& node = *to[i];
+        const auto pt = node.pos();
+        if (auto* cl = (cell*)g.item(pt.y, pt.x); cl) {
+            const auto colour = to_colour(i);
+            cl->setBackground(colour);
+            QThread::sleep(cell_paint_duration);
+        }
+    }
+}
+
+void visualise_route(const graph::route<grid_type>& r, grid& g, std::chrono::seconds paint_duration) {
+    auto to_colour = [route_length = r.length](const size_t cell_n) {
+        uint8_t max_color = 0xff;
+        QBrush brush;
+        double red_hardness = (double)cell_n / route_length;
+        uint8_t red = max_color * red_hardness;
+        brush.setColor(QColor ( red, 0, 0 ));
+        brush.setStyle(Qt::SolidPattern);
+        return brush;
+    };
+
+    const auto cell_paint_duration = std::chrono::duration_cast<std::chrono::milliseconds>(paint_duration) / r.length;
+    size_t n = 0;
+    for (auto pt : r) {
+        if (auto* cl = (cell*)g.item(pt.y, pt.x); cl) {
+            cl->setBackground(to_colour(n));
+            QThread::sleep(cell_paint_duration);
+        }
+        ++n;
+    }
+}
+
 } // end anonymous namespace
 
 main_frame::main_frame() : QMainWindow(),
@@ -304,42 +355,9 @@ void main_frame::_run_algorithm() {
 }
 
 void main_frame::_visualise_algorithm(const graph::route<grid_type>& r) {
-    const size_t visitation_count = r.visitation_order.size();
-    auto to_colour = [visitation_count](const size_t cell_n) {
-        uint8_t max_color = 0xff;
-        const size_t cells_left = visitation_count - cell_n;
-        double visitation_count_d = double(visitation_count);
-
-        int32_t blue = (cells_left / visitation_count_d) * max_color;
-        int32_t green = max_color - blue;
-        QColor c(0, green, blue);
-        
-        QBrush brush;
-        brush.setColor(c);
-        brush.setStyle(Qt::SolidPattern);
-        return brush;
-    };
-
-    const auto algorithm_painting_duration = std::chrono::seconds(5);
-    const auto cell_paint_duration = std::chrono::duration_cast<std::chrono::milliseconds>(algorithm_painting_duration) / visitation_count;
-    for (size_t i = 0; i < visitation_count; ++i) {
-        auto& node = *r.visitation_order[i];
-        const auto pt = node.pos();
-        if (auto* cl = (cell*)_grid->item(pt.y, pt.x); cl) {
-            const auto colour = to_colour(i);
-            cl->setBackground(colour);
-            QThread::sleep(cell_paint_duration);
-        }
-    }
-    
+    visualise_visitation_order(r.visitation_order, *_grid, std::chrono::seconds(5));
     QThread::sleep(std::chrono::seconds(1));
-    
-    for (auto pt : r) {
-        if (auto* cl = (cell*)_grid->item(pt.y, pt.x); cl) {
-            cl->setBackground(Qt::red);
-            QThread::sleep(cell_paint_duration);
-        }
-    }
+    visualise_route(r, *_grid, std::chrono::seconds(1));
         
     _toolbar->setEnabled(true);
     _grid->setEnabled(true);
