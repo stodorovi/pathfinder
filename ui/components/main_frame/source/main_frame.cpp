@@ -284,7 +284,8 @@ void main_frame::_visualise_algorithm(const graph::route<grid_type>& r) {
         return brush;
     };
 
-    const auto cell_paint_duration = std::chrono::milliseconds(500);
+    const auto algorithm_painting_duration = std::chrono::seconds(5);
+    const auto cell_paint_duration = std::chrono::duration_cast<std::chrono::milliseconds>(algorithm_painting_duration) / visitation_count;
     for (size_t i = 0; i < visitation_count; ++i) {
         auto& node = *r.visitation_order[i];
         const auto pt = node.pos();
