@@ -3,6 +3,7 @@
 #include "router.h"
 #include "dijkstra.h"
 
+#include <cmath>
 #include <queue>
 
 namespace graph {
@@ -16,8 +17,11 @@ protected:
     components::weight_t _heuristic_weight(
         components::node_ptr<T> node, components::node_ptr<T> end_node, components::edge<T>& e
     ) {
-        auto route = _dr.calc(e.node->pos(), end_node->pos());
-        return e.weight + route.length;
+        const auto n_pt = e.node->pos();
+        const auto end_pt = end_node->pos();
+        
+        double mult = sqrt(abs(n_pt.x - end_pt.x) + abs(n_pt.y - end_pt.y));
+        return 1000 * mult;
     }
 
 public:
