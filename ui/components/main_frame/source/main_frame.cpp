@@ -291,6 +291,7 @@ void main_frame::_run_algorithm() {
     }
 
     _toolbar->setEnabled(false);
+    _grid->setEnabled(false);
 
     if (!_grid_states.empty())
         _restore_grid_states();
@@ -341,6 +342,7 @@ void main_frame::_visualise_algorithm(const graph::route<grid_type>& r) {
     }
         
     _toolbar->setEnabled(true);
+    _grid->setEnabled(true);
 }
 
 void main_frame::_register_connections() {
