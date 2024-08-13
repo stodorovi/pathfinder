@@ -52,13 +52,8 @@ protected:
         components::weight_t weight;
         std::shared_ptr<unvisited_node> previous_node;
 
-        auto operator<=>(const unvisited_node& e) const {
-            if (this->weight < e.weight) return -1;
-            if (this->weight > e.weight) return 1;
-            return 0;
-        }
-        bool operator==(const unvisited_node& e) const {
-            return this->node == e.node;
+        bool operator>(const unvisited_node& e) const {
+            return this->weight > e.weight;
         }
     };
 
