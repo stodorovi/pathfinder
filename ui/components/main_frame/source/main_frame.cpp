@@ -178,7 +178,11 @@ void show_empty_grid_error_message() {
     msgbox.exec();
 }
 
-void visualise_visitation_order(const graph::route<grid_type>::route_visitation_order& to, grid& g, std::chrono::seconds paint_duration) {
+template<typename Rep, typename Period>
+void visualise_visitation_order(
+    const graph::route<grid_type>::route_visitation_order& to, grid& g,
+    std::chrono::duration<Rep, Period> paint_duration
+) {
     const size_t visitation_count = to.size();
     auto to_colour = [visitation_count](const size_t cell_n) {
         uint8_t max_color = 0xff;
@@ -207,7 +211,8 @@ void visualise_visitation_order(const graph::route<grid_type>::route_visitation_
     }
 }
 
-void visualise_route(const graph::route<grid_type>& r, grid& g, std::chrono::seconds paint_duration) {
+template<typename Rep, typename Period>
+void visualise_route(const graph::route<grid_type>& r, grid& g, std::chrono::duration<Rep, Period> paint_duration) {
     auto to_colour = [route_length = r.length](const size_t cell_n) {
         uint8_t max_color = 0xff;
         QBrush brush;

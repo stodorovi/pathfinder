@@ -1,7 +1,6 @@
 #pragma once
 
 #include "router.h"
-#include "dijkstra.h"
 
 #include <cmath>
 #include <queue>
@@ -12,7 +11,6 @@ ARITMETIC_T
 class a_star : public router<T> {
 using route_t = route<T>;
 protected:
-    dijkstra<T> _dr;
 
     components::weight_t _heuristic_weight(
         components::node_ptr<T> node, components::node_ptr<T> end_node, components::edge<T>& e
@@ -27,7 +25,7 @@ protected:
     }
 
 public:
-    a_star(graph<T>& graph) : router<T>(graph), _dr(graph)
+    a_star(graph<T>& graph) : router<T>(graph)
     {}
 
     using router<T>::calc;
