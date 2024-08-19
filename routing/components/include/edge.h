@@ -13,9 +13,12 @@ ARITMETIC_T struct node;
 using weight_t = uint32_t;
 
 ARITMETIC_T struct edge {
+using node_ptr_t = std::shared_ptr<node<T>>;
+using edge_t = edge<T>;
 public:
     weight_t weight;
-    std::shared_ptr<node<T>> node;
+    node_ptr_t node;
+    bool operator==(const edge_t&) const = default;
 };
 
 } // end namespace components

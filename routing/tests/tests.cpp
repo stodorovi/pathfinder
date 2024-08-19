@@ -1,3 +1,4 @@
+#include <functional>
 #include <iostream>
 #include <iomanip>
 #include <memory>
@@ -8,6 +9,7 @@
 
 #include "../routers/include/dijkstra.h"
 #include "../routers/include/a_star.h"
+#include "../routers/include/hpa_star.h"
 
 ARITMETIC_T
 std::string points_print(const std::vector<graph::types::point<T>>& points) {
@@ -143,16 +145,20 @@ auto surrounding_nodes(
 }
 
 /*
-    o - o - o - o
-    |   |   |   |
-    o - o - o - o
-    |   |   |   |
-    o - o - o - o
-    |   |   |   |
-    o - o - o - o
+    o - o - o - o - o - o
+    |   |   |   |   |   |
+    o - o - o - o - o - o
+    |   |   |   |   |   |
+    o - o - o - o - o - o
+    |   |   |   |   |   |
+    o - o - o - o - o - o
+    |   |   |   |   |   |
+    o - o - o - o - o - o
+    |   |   |   |   |   |
+    o - o - o - o - o - o
 */
 auto grid_graph() {
-    constexpr int grid_size = 4;
+    constexpr int grid_size = 6;
     std::vector<std::vector<graph::node_ptr<int>>> nodes(grid_size);
     for (int r = 0; r < nodes.size(); ++r) {
         nodes[r] = std::vector<graph::node_ptr<int>>(grid_size);
@@ -202,8 +208,8 @@ void test_a_star() {
     graph::router::dijkstra<int> dr(g);
     graph::router::a_star<int> ar(g);
 
-    auto dijkstra_route = dr.calc(graph::types::point(0, 0), graph::types::point(3, 3));
-    auto a_star_route = ar.calc(graph::types::point(0, 0), graph::types::point(3, 3));
+    auto dijkstra_route = dr.calc(graph::types::point(0, 0), graph::types::point(5, 5));
+    auto a_star_route = ar.calc(graph::types::point(0, 0), graph::types::point(5, 5));
 
     test_route(a_star_route.node, dijkstra_route.node, "A* == Dijkstra route | grid graph"
     );
@@ -213,7 +219,21 @@ void test_a_star() {
     );
 }
 
+void test_hpa_start() {
+    auto g = grid_graph();
+    graph::router::hpa_star<int> hpar(g);
+    graph::router::a_star<int> ar(g);
+
+    const auto hpa_route = hpar.calc(graph::types::point(0, 0), graph::types::point(5, 5));
+    const auto a_route = ar.calc(graph::types::point(0, 0), graph::types::point(5, 5));
+
+    test_len<std::greater<size_t>>(hpa_route.visitation_order.size(), a_route.visitation_order.size(),
+        "HPA* greater visitation size than A* because it traverses in between clusters instead of diagonaly", ">"
+    );
+}
+
 int main() {
     test_dijkstra();
     test_a_star();
+    test_hpa_start();
 }

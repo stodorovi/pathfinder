@@ -11,21 +11,28 @@ ARITMETIC_T class edge;
 
 ARITMETIC_T struct node {
 private:
-    types::point<T> _pos;
+    using node_t = node<T>;
+    using node_ptr_t = std::shared_ptr<node_t>;
 
-    using edges_v = std::vector<edge<T>>;
+    using point_t = types::point<T>;
+    point_t _pos;
+
+    using edge_t = edge<T>;
+    using edges_v = std::vector<edge_t>;
     edges_v _edges;
 
 public:
     node() : _pos(), _edges() {}
-    node(types::point<T> p) : _pos(p), _edges() {}
+    node(point_t p) : _pos(p), _edges() {}
     node(T x, T y) : _pos(types::point(x, y)), _edges() {}
 
-    types::point<T> pos() {
+    bool operator==(const node_t& other) const = default;
+
+    point_t pos() const {
         return _pos;
     }
 
-    void pos(types::point<T> p) {
+    void pos(point_t p) {
         _pos = p;
     }
 
@@ -33,7 +40,13 @@ public:
         return _edges;
     }
 
-    edge<T>& insert_edge(const edge<T>& e) {
+    bool connected_to(const node_ptr_t& n) const {
+        for (auto& edge : _edges)
+            if (edge.node == n) return true;
+        return false;
+    }
+
+    edge_t& insert_edge(const edge_t& e) {
         _edges.push_back(e);
         return _edges.back();
     }

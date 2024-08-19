@@ -7,6 +7,7 @@
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 namespace graph {
 ARITMETIC_T
@@ -62,6 +63,13 @@ public:
             return _node_lookup_table.at(pt);
 
         return nullptr;
+    }
+
+    std::vector<point_t> points() const {
+        std::vector<point_t> rv(_node_lookup_table.size());
+        for (auto& [pt, _] : _node_lookup_table)
+            rv.push_back(pt);
+        return rv;
     }
 };
 } // end namespace graph
