@@ -151,7 +151,6 @@ std::vector<transition_point> _all_cluster_entrances(const rect_t& c, const clus
     return rv;
 }
 
-using router<T>::calc;
 node_ptr_t _create_abstract_graph() {
     std::unordered_map<point_t, node_ptr_t> nodes;
     auto get_node = [&](const point_t& pt) mutable {
