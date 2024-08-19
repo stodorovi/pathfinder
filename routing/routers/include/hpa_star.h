@@ -90,6 +90,7 @@ entrances_t _entrances_between_clusters(const rect_t& c1, const rect_t& c2, entr
 
         auto first_node = graph.node_by_pos(first_pt);
         auto second_node = graph.node_by_pos(second_pt);
+        if (!first_node || !second_node) continue;
         const bool connected = first_node->connected_to(second_node) && second_node->connected_to(first_node);
         if (!connected) {
             if (entrance_rect != rect_t::inside_out()) rv.push_back(entrance_rect);
