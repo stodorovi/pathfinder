@@ -237,6 +237,39 @@ void visualise_route(const graph::route<grid_type>& r, grid& g, std::chrono::dur
     }
 }
 
+void visualise_clusters(const auto cluster_map, grid& g) {
+     static constexpr QColor colours[] {
+        QColorConstants::Svg::blueviolet,
+        QColorConstants::Svg::darkmagenta,
+        QColorConstants::Svg::darkorchid,
+        QColorConstants::Svg::darkviolet
+     };
+
+    size_t colour_i = 0;
+    for (auto& [ rect, traversal_pts ] : cluster_map) {
+        for (size_t x = rect.left; x <= rect.right; ++x) {
+            for (size_t y = rect.bottom; y <= rect.top; ++y) {
+                auto* c = (cell*)g.item(y, x);
+                if (!c) continue;
+                if (c->state() == cell_state::empty)
+                    c->setBackground(colours[colour_i]);
+            }
+        }
+        ++colour_i;
+
+        for (const auto& [ entry, exit ] : traversal_pts) {
+            auto* entry_cell = (cell*)g.item(entry.y, entry.x);
+            auto* exit_cell = (cell*)g.item(exit.y, exit.x);
+            if (!entry_cell || !exit_cell) continue;
+
+            if (entry_cell->state() == cell_state::empty)
+                entry_cell->setBackground(Qt::yellow);
+            if (exit_cell->state() == cell_state::empty)
+                exit_cell->setBackground(Qt::yellow);
+        } 
+    }
+}
+
 } // end anonymous namespace
 
 main_frame::main_frame() : QMainWindow(),
@@ -337,8 +370,8 @@ void main_frame::_run_algorithm() {
         return;
     }
 
-    if (const auto router = choose_router(_toolbar->current_algorithm(), graph); router) {
-        const auto route = router->calc(start, end);
+    if (auto router = choose_router(_toolbar->current_algorithm(), graph); router) {
+        auto route = router->calc(start, end);
 
 #if !NDEBUG
         log_route(route);
@@ -355,7 +388,12 @@ void main_frame::_run_algorithm() {
     if (!_grid_states.empty())
         _restore_grid_states();
     
-    auto _ = QtConcurrent::run([route = std::move(route), this](){
+    auto _ = QtConcurrent::run([router = std::move(router), route = std::move(route), alg = _toolbar->current_algorithm(), this](){
+        if (alg == algorithm::hpa_star) {
+            //const auto& clusters = (graph::router::hpa_star<grid_type>*(router.get()).clusters();
+            const auto clusters = static_cast<graph::router::hpa_star<grid_type>*>(router.get())->clusters();
+            visualise_clusters(clusters, *_grid);
+        }
         this->_set_grid_states();
         this->_visualise_algorithm(route);
     });
