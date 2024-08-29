@@ -32,7 +32,7 @@ using a_star_t = a_star<T>;
 using node_ptr_t = node_ptr<T>;
 using visitation_order_v = std::vector<node_ptr_t>;
 
-private:
+protected:
 // tl, tr, br, bl
 clusters_map _clusters;
 graph_t _abstract_graph;
@@ -189,7 +189,7 @@ clusters_map _init_clusters() {
     return rv;
 }
 
-const cluster_t* find_cluster(const point_t& pt) {
+const cluster_t* _find_cluster(const point_t& pt) {
     for (const auto& cluster : _clusters)
         if (cluster.first.contains(pt)) return &cluster;
     return nullptr;
@@ -235,8 +235,8 @@ public:
     {}
 
     route_t calc(point_t start, point_t end) override {
-        const auto start_cluster = find_cluster(start);
-        const auto end_cluster = find_cluster(end);
+        const auto start_cluster = _find_cluster(start);
+        const auto end_cluster = _find_cluster(end);
         if (!start_cluster || !end_cluster) return {};
 
         if (*start_cluster == *end_cluster) 
@@ -297,7 +297,7 @@ public:
             return merged_route;
         }();
 
-        return merged_route;;
+        return merged_route;
     }
 
     const auto& clusters() const {

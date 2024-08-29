@@ -1,3 +1,6 @@
+#include <cassert>
+#include <chrono>
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <iomanip>
@@ -157,8 +160,7 @@ auto surrounding_nodes(
     |   |   |   |   |   |
     o - o - o - o - o - o
 */
-auto grid_graph() {
-    constexpr int grid_size = 6;
+auto grid_graph(const int grid_size = 6) {
     std::vector<std::vector<graph::node_ptr<int>>> nodes(grid_size);
     for (int r = 0; r < nodes.size(); ++r) {
         nodes[r] = std::vector<graph::node_ptr<int>>(grid_size);
@@ -232,8 +234,84 @@ void test_hpa_start() {
     );
 }
 
+template<typename Router>
+double measure_calculation_time(Router& r,  const graph::types::point<int>& start, const graph::types::point<int>& end) {
+    uint64_t duration_sum = 0;
+
+    const int loop_count = 100;
+    for (size_t i = 0; i < loop_count; ++i) {
+        const auto start_time = std::chrono::high_resolution_clock::now();
+        const auto route = r.calc(start, end);
+        assert(route.node != nullptr);
+        const auto end_time = std::chrono::high_resolution_clock::now();
+        const auto time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+        duration_sum += time.count();
+    }
+
+    return duration_sum / (double)loop_count / 1000;
+
+}
+
+struct hpa_star_caching_t : public graph::router::hpa_star<int> {
+    hpa_star_caching_t(graph::graph<int>& g) : graph::router::hpa_star<int>(g) {}
+
+    graph::route<int> calc(graph::types::point<int> start, graph::types::point<int> end) override {
+        using a_star_t = graph::router::a_star<int>;
+
+        const auto start_cluster = _find_cluster(start);
+        const auto end_cluster = _find_cluster(end);
+        
+        // connect start and exit nodes
+        auto start_node = std::make_shared<graph::components::node<int>>(start);
+        for (auto& [ inside, exit ] : start_cluster->second) {
+            const auto route = a_star_t::calc(start, inside);
+        }
+        auto end_node = std::make_shared<graph::components::node<int>>(end);
+        for (auto& [ inside, exit ] : end_cluster->second) {
+            const auto route = a_star_t::calc(inside, end);
+        }
+
+        // pretend the cluster routes are cached
+        a_star_t astar_abstract(_abstract_graph);
+        return astar_abstract.calc(start_cluster->second.front().first, end_cluster->second.front().first);
+    }
+};
+
+void algs_run_time(int grid_size) {
+    auto g = grid_graph(grid_size);
+    const auto start_point = graph::types::point<int> { 0, 0 };
+    const auto end_point = graph::types::point<int> { grid_size - 1, grid_size - 1 };
+
+    graph::router::dijkstra<int> dijkstra(g);
+    graph::router::a_star<int> a_star(g);
+    graph::router::hpa_star<int> hpa_star(g);
+    hpa_star_caching_t hpa_star_caching(g);
+
+    const auto dijkstra_run_time = measure_calculation_time(dijkstra, start_point, end_point);
+    const auto a_star_run_time = measure_calculation_time(a_star, start_point, end_point);
+    const auto hpa_star_run_time = measure_calculation_time(hpa_star, start_point, end_point);
+    const auto hpa_cached_star_run_time = measure_calculation_time(hpa_star_caching, start_point, end_point);
+
+    std::cout << "Testing algorithms run time (grid size: " << grid_size << "x" << grid_size << ")"
+        << "\n\tDijkstra:"          << std::setw(14) << std::setfill('.') << "| " << dijkstra_run_time << " ms"
+        << "\n\tA*:"                << std::setw(20) << std::setfill('.') << "| " << a_star_run_time << " ms"
+        << "\n\tHPA* (no caching):" << std::setw(5)  << std::setfill('.') << "| " << hpa_star_run_time << " ms"
+        << "\n\tHPA* (caching):"    << std::setw(8)  << std::setfill('.') << "| " << hpa_cached_star_run_time << " ms"
+        << "\n\n";
+}
+
+void test_run_time() {
+    algs_run_time(10);
+    algs_run_time(20);
+    algs_run_time(40);
+    algs_run_time(80);
+    algs_run_time(160);
+    algs_run_time(320);
+}
+
 int main() {
     test_dijkstra();
     test_a_star();
     test_hpa_start();
+    test_run_time();
 }
